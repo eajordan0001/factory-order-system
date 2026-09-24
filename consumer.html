@@ -10,7 +10,7 @@
     <style>
         body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
         h2 { font-size: 28px; }
-        .order-card { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; font-size: 26px; }
+        .order-card { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
         .complete-btn { background-color: #f44336; color: white; border: none; padding: 15px 30px; font-size: 22px; cursor: pointer; border-radius: 5px; }
         .complete-btn:hover { background-color: #d32f2f; }
         .empty-msg { font-size: 24px; color: #666; margin-top: 30px; }
@@ -40,9 +40,11 @@
                     html += `
                         <div class="order-card">
                             <div>
-                                <span style="color: #007bff; font-size: 20px; font-weight: bold;">[${order.line}]</span><br>
-                                <strong style="font-size: 32px;">單號：${order.orderNo}</strong>
-                                <div style="font-size: 14px; color: #888; margin-top: 5px;">送單時間：${order.timestamp}</div>
+                                <!-- 產線字體已放大 1.5 倍 (20px -> 30px) -->
+                                <span style="color: #007bff; font-size: 30px; font-weight: bold;">${order.line}</span><br>
+                                <!-- 單號字體已放大 1.5 倍 (32px -> 48px) -->
+                                <strong style="font-size: 48px;">單號：${order.orderNo}</strong>
+                                <div style="font-size: 16px; color: #888; margin-top: 5px;">送單時間：${order.timestamp}</div>
                             </div>
                             <button class="complete-btn" onclick="completeOrder('${order.id}')">已完成</button>
                         </div>
