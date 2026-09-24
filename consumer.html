@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>後端取餐叫號顯示端</title>
+    <!-- PWA 連結 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2196F3">
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f9; }
+        h2 { font-size: 28px; }
+        .order-card { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; font-size: 26px; }
+        .complete-btn { background-color: #f44336; color: white; border: none; padding: 15px 30px; font-size: 22px; cursor: pointer; border-radius: 5px; }
+        .complete-btn:hover { background-color: #d32f2f; }
+        .empty-msg { font-size: 24px; color: #666; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <h2>後端待備料清單</h2>
+    <div id="orderList"><div class="empty-msg">載入中...</div></div>
+
+    <script>
+        // 請將下方引號內替換成您的 Google Apps Script 網頁應用程式網址
+        const WEB_APP_URL = "您的_APPS_SCRIPT_網址_URL";
+
+        async function fetchOrders() {
+            try {
+                let response = await fetch(WEB_APP_URL);
+                let orders = await response.json();
+                
+                let container = document.getElementById('orderList');
+                if (orders.length === 0) {
+                    container.innerHTML = '<div class="empty-msg">目前沒有待處理的單號</div>';
+                    return;
+                }
+
+                let html = '';
+                orders.forEach(order => {
+                    html += `
+                        <div class="order-card">
+                            <div>
+                                <span style="color: #007bff; font-size: 20px; font-weight: bold;">[${order.line}]</span><br>
+                                <strong style="font-size: 32px;">單號：${order.orderNo}</strong>
+                                <div style="font-size: 14px; color: #888; margin-top: 5px;">送單時間：${order.timestamp}</div>
+                            </div>
+                            <button class="complete-btn" onclick="completeOrder('${order.id}')">已完成</button>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('抓取資料失敗', error);
+            }
+        }
+
+        async function completeOrder(id) {
+            if(!confirm('確定此單已完成並從畫面上移除嗎？')) return;
+
+            try {
+                let response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: "completeOrder", id: id })
+                });
+                let result = await response.json();
+                if(result.status === "success") {
+                    fetchOrders(); // 立即重新整理畫面
+                }
+            } catch (error) {
+                alert('操作失敗');
+            }
+        }
+
+        // 頁面載入時先抓一次，之後每 3 秒自動向後端同步一次
+        fetchOrders();
+        setInterval(fetchOrders, 3000);
+    </script>
+</body>
+</html>

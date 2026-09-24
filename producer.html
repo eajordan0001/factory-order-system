@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>產線備料送單端</title>
+    <!-- PWA 連結 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <style>
+        body { font-family: sans-serif; padding: 20px; font-size: 20px; }
+        input, select, button { font-size: 20px; padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+        button:active { background-color: #45a049; }
+    </style>
+</head>
+<body>
+    <h2>產線備料送單系統</h2>
+    <label>選擇產線：</label>
+    <select id="lineSelect">
+        <option value="1-1(腳)">1-1(腳)</option>
+        <option value="1-1(緩)">1-1(緩)</option>
+        <option value="1-2(5人)">1-2(5人)</option>
+        <option value="2-1(後半)">2-1(後半)</option>
+        <option value="2-2(油)">2-2(油)</option>
+        <option value="3-1(油)">3-1(油)</option>
+        <option value="3-1(腳)">3-1(腳)</option>
+        <option value="3-2(腳)">3-2(腳)</option>
+    </select>
+    
+    <label>輸入備料單號：</label>
+    <input type="text" id="orderNoInput" placeholder="例如：B001" autocomplete="off">
+    
+    <button onclick="submitOrder()">送出備料單</button>
+
+    <script>
+        // 請將下方引號內替換成您的 Google Apps Script 網頁應用程式網址
+        const WEB_APP_URL = "您的_APPS_SCRIPT_網址_URL";
+
+        async function submitOrder() {
+            const line = document.getElementById('lineSelect').value;
+            const orderNo = document.getElementById('orderNoInput').value.trim();
+            
+            if(!orderNo) {
+                alert('請輸入單號！');
+                return;
+            }
+
+            const data = {
+                action: "addOrder",
+                line: line,
+                orderNo: orderNo
+            };
+
+            try {
+                let response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                let result = await response.json();
+                if(result.status === "success") {
+                    alert('單號 ' + orderNo + ' 已成功送出！');
+                    document.getElementById('orderNoInput').value = '';
+                    document.getElementById('orderNoInput').focus();
+                }
+            } catch (error) {
+                alert('送出失敗，請檢查網路連線');
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
